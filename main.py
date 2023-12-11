@@ -1,5 +1,37 @@
 import tkinter as tk
 import csv
+import sqlite3
+
+def create_connection():
+    # create a database connection to the SQLite database
+    conn = None
+    try:
+        conn = sqlite3.connect('grocery.db')
+        print("Connection successful!")
+    except sqlite3.Error as e:
+        print(e)
+
+    return conn
+
+# Function to write transaction to Database
+def new_transaction(transid: int, empid: int, custid: int, prodid: int, quan: int, totalamt: float, dte: str):
+    conn = create_connection()
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute('''INSERT INTO Transactions(transaction_id, customer_id, employee_id, product_id, quantity, total_amount, date)
+                            VALUES (?, ?, ?, ?, ?, ?, ?)''', (transid, custid, empid, prodid, quan, totalamt, dte))
+            conn.commit()
+            print("Transaction added successfully!")
+        except sqlite3.Error as e:
+            print(e)
+        finally:
+            conn.close()
+    else:
+        print("Error: Unable to establish a database connection.")
+
+# Example usage:
+# new_transaction(1, 101, 201, 301, 5, 50.0, '2023-12-11')
 
 # Create CSV files for each table (Sample data)
 def create_csv_files():
